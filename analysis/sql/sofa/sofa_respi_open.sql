@@ -1,5 +1,4 @@
 -- create table public.sofa_respi_open AS
-  (
   WITH
     tempo2 AS (
     WITH
@@ -14,7 +13,7 @@
             MAX(CAST(respchartvalue AS numeric)) AS rcfio2
             -- , max(case when respchartvaluelabel = 'FiO2' then respchartvalue else null end) as fiO2
           FROM
-            eicu_crd_phi.respiratorycharting
+            `physionet-data.eicu_crd_phi.respiratorycharting`
           WHERE
             respchartoffset BETWEEN -120
             AND 1440
@@ -31,7 +30,7 @@
           DISTINCT patientunitstayid,
           MAX(CAST(nursingchartvalue AS numeric)) AS ncfio2
         FROM
-          eicu_crd_phi.nursecharting nc
+          `physionet-data.eicu_crd_phi.nursecharting` nc
         WHERE
           LOWER(nursingchartcelltypevallabel) LIKE '%fio2%'
           AND nursingchartvalue ~ '^[0-9]{0,2}$'
@@ -47,7 +46,7 @@
               WHEN sao2 IS NOT NULL THEN sao2
               ELSE NULL END) AS sao2
         FROM
-          eicu_crd_phi.vitalperiodic
+          `physionet-data.eicu_crd_phi.vitalperiodic`
         WHERE
           observationoffset BETWEEN -1440
           AND 1440
@@ -60,7 +59,7 @@
               WHEN LOWER(labname) LIKE 'pao2%' THEN labresult
               ELSE NULL END) AS pao2
         FROM
-          eicu_crd_phi.lab
+          `physionet-data.eicu_crd_phi.lab`
         WHERE
           labresultoffset BETWEEN -1440
           AND 1440
@@ -75,7 +74,7 @@
                 WHEN airwaytype IN ('Oral ETT', 'Nasal ETT', 'Tracheostomy') THEN 1
                 ELSE NULL END) AS airway  -- either invasive airway or NULL
           FROM
-            eicu_crd_phi.respiratorycare
+            `physionet-data.eicu_crd_phi.respiratorycare`
           WHERE
             respcarestatusoffset BETWEEN -1440
             AND 1440
@@ -88,7 +87,7 @@
             DISTINCT patientunitstayid,
             1 AS ventilator
           FROM
-            eicu_crd_phi.respiratorycharting rc
+            `physionet-data.eicu_crd_phi.respiratorycharting` rc
           WHERE
             respchartvalue LIKE '%ventilator%'
             OR respchartvalue LIKE '%vent%'
@@ -112,7 +111,7 @@
                 WHEN treatmentstring IN ('pulmonary|ventilation and oxygenation|mechanical ventilation',  'pulmonary|ventilation and oxygenation|tracheal suctioning',  'pulmonary|ventilation and oxygenation|ventilator weaning',  'pulmonary|ventilation and oxygenation|mechanical ventilation|assist controlled',  'pulmonary|radiologic procedures / bronchoscopy|endotracheal tube',  'pulmonary|ventilation and oxygenation|oxygen therapy (> 60%)',  'pulmonary|ventilation and oxygenation|mechanical ventilation|tidal volume 6-10 ml/kg',  'pulmonary|ventilation and oxygenation|mechanical ventilation|volume controlled',  'surgery|pulmonary therapies|mechanical ventilation',  'pulmonary|surgery / incision and drainage of thorax|tracheostomy',  'pulmonary|ventilation and oxygenation|mechanical ventilation|synchronized intermittent',  'pulmonary|surgery / incision and drainage of thorax|tracheostomy|performed during current admission for ventilatory support',  'pulmonary|ventilation and oxygenation|ventilator weaning|active',  'pulmonary|ventilation and oxygenation|mechanical ventilation|pressure controlled',  'pulmonary|ventilation and oxygenation|mechanical ventilation|pressure support',  'pulmonary|ventilation and oxygenation|ventilator weaning|slow',  'surgery|pulmonary therapies|ventilator weaning',  'surgery|pulmonary therapies|tracheal suctioning',  'pulmonary|radiologic procedures / bronchoscopy|reintubation',  'pulmonary|ventilation and oxygenation|lung recruitment maneuver',  'pulmonary|surgery / incision and drainage of thorax|tracheostomy|planned',  'surgery|pulmonary therapies|ventilator weaning|rapid',  'pulmonary|ventilation and oxygenation|prone position',  'pulmonary|surgery / incision and drainage of thorax|tracheostomy|conventional',  'pulmonary|ventilation and oxygenation|mechanical ventilation|permissive hypercapnea',  'surgery|pulmonary therapies|mechanical ventilation|synchronized intermittent',  'pulmonary|medications|neuromuscular blocking agent',  'surgery|pulmonary therapies|mechanical ventilation|assist controlled',  'pulmonary|ventilation and oxygenation|mechanical ventilation|volume assured',  'surgery|pulmonary therapies|mechanical ventilation|tidal volume 6-10 ml/kg',  'surgery|pulmonary therapies|mechanical ventilation|pressure support',  'pulmonary|ventilation and oxygenation|non-invasive ventilation',  'pulmonary|ventilation and oxygenation|non-invasive ventilation|face mask',  'pulmonary|ventilation and oxygenation|non-invasive ventilation|nasal mask',  'pulmonary|ventilation and oxygenation|mechanical ventilation|non-invasive ventilation',  'pulmonary|ventilation and oxygenation|mechanical ventilation|non-invasive ventilation|face mask',  'surgery|pulmonary therapies|non-invasive ventilation',  'surgery|pulmonary therapies|non-invasive ventilation|face mask',  'pulmonary|ventilation and oxygenation|mechanical ventilation|non-invasive ventilation|nasal mask',  'surgery|pulmonary therapies|non-invasive ventilation|nasal mask',  'surgery|pulmonary therapies|mechanical ventilation|non-invasive ventilation',  'surgery|pulmonary therapies|mechanical ventilation|non-invasive ventilation|face mask' ) THEN 1
                 ELSE NULL END) AS interface   -- either ETT/NiV or NULL
           FROM
-            eicu_crd_phi.treatment
+            `physionet-data.eicu_crd_phi.treatment `
           WHERE
             treatmentoffset BETWEEN -1440
             AND 1440
@@ -128,7 +127,7 @@
             ELSE NULL
           END AS mechvent
         FROM
-          eicu_crd_phi.patient pt
+          `physionet-data.eicu_crd_phi.patient pt`
         LEFT OUTER JOIN
           t1
         ON
@@ -154,7 +153,7 @@
             ELSE NULL END) AS fio2,
         t5.mechvent
       FROM
-        eicu_crd_phi.patient pt
+        `physionet-data.eicu_crd_phi.patient` pt
       LEFT OUTER JOIN
         t1
       ON
@@ -215,4 +214,4 @@
   FROM
     tempo2
   ORDER BY
-    patientunitstayid );
+    patientunitstayid
